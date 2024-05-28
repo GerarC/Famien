@@ -95,12 +95,18 @@ void execute_cpu(Cpu6502 *cpu){
             printf("%s\n", parse_cpu_str(*cpu));
             x++;
         }
-        if(x == 32) break;
+        if(x == 16) break;
      }
 }
 
 void connect_bus(Cpu6502 *cpu, Bus *bus){
     cpu->bus = bus;
+}
+
+void connect_bus_methods(
+        Cpu6502 *cpu, void (*write_ram)(Bus *, Word, Byte), Byte (*read_ram)(Bus *, Word)){
+    cpu->read_ram = read_ram;
+    cpu->write_ram = write_ram;
 }
 
 void reset_cpu(Cpu6502 *cpu){

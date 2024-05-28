@@ -8,8 +8,7 @@ void initialize_bus(Bus *bus){
     initialize_ram(bus->ram);
     initialize_cpu(&bus->cpu);
     connect_bus(&bus->cpu, bus);
-    bus->cpu.read_ram = &read_ram;
-    bus->cpu.write_ram = &write_ram;
+    connect_bus_methods(&bus->cpu, &write_ram, &read_ram);
     reset_cpu(&bus->cpu);
 }
 

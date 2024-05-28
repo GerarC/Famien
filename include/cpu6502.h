@@ -4,6 +4,9 @@
 #include "types.h"
 
 
+/*
+ * Enum that saves Symbol and value of cpu flags
+ */
 typedef enum {
     C = (1 << 0),
     Z = (1 << 1),
@@ -15,6 +18,13 @@ typedef enum {
     N = (1 << 7)
 } Flags6502;
 
+/*
+ * Intruction represent an asm operation of the 6502 cpu, its address mode and
+ * needed cycles to do the operation.
+ *
+ * This class is very useful to translate bits in the current asm intructions.
+ *
+ */
 typedef struct {
     char name[3];
     uint8_t (*operate)(Cpu6502 *cpu);
@@ -22,6 +32,9 @@ typedef struct {
     uint8_t cycles;
 } Instruction;
 
+/*
+ * This struct represents a 6502 
+ */
 typedef struct cpu6502_t{
     Bus* bus;
     Word pc; // Program counter
@@ -43,7 +56,6 @@ typedef struct cpu6502_t{
         };
     } ;
 
-
     Byte fetched;
     Word address_absolute;
     Word address_relative;
@@ -52,7 +64,9 @@ typedef struct cpu6502_t{
     Word cycles;
     Instruction lookup[256];
     
+    /*Writes data in the Ram connected to the given bus*/
     void (* write_ram)(Bus* bus, Word address, Byte data);
+    /*Reads data from Ram connected to the given bus*/
     Byte (* read_ram)(Bus* bus, Word address);
 
 } Cpu6502;
@@ -61,20 +75,90 @@ typedef struct cpu6502_t{
 /*
  * initialize the given CPU to default values
  *
+ * Initial values are all zero and the lookup that is the data base of instructions
+ *
  * input:
  *  cpu: the cpu to re init.
  */
 void initialize_cpu(Cpu6502 *cpu);
+
 void execute_cpu(Cpu6502 *cpu);
+
+/*
+ * Connect the CPU the given bus
+ *
+ * Input:
+ *  cṕu: the required cpu
+ *  bus: bus where the cpu will be connected.
+ */
 void connect_bus(Cpu6502 *cpu, Bus *bus);
+
+/*
+ * Connects the ram with the methods that allows to read and write data in
+ * Ram connected in the Bus.
+ *
+ * Input:
+ *  cpu: the cpu to connect.
+ *  write_ram: a function that receives a bus, an address and data.
+ *  read_ram: a function that receives a bus and an address to read data
+ *
+ */
+void connect_bus_methods(Cpu6502 *cpu, 
+    void (* write_ram)(Bus* bus, Word address, Byte data),
+    Byte (* read_ram)(Bus* bus, Word address));
+
+/*
+ * Resets the given CPU to default values of the registers and directions and
+ * loads the initial pc from ram.
+ *
+ * Cpu, read_ram and write_ram must be connected to the cpu
+ *
+ */
 void reset_cpu(Cpu6502 *cpu);
+
+/*
+ * Reads the program counter and executes the instruction of the retrieved opcode
+ *
+ * input:
+ *  cpu: the cpu that executes the instruction.
+ * */
 void clock(Cpu6502 *cpu);
+
+/*
+ * Fetches data that is in absolute address and return it
+ *
+ * input:
+ *  cpu that needs that information
+ * return:
+ *  (Byte) fetched data.
+ *
+ */
 Byte fetch(Cpu6502 *cpu);
+
+/*
+ * Sets a flag in the cpu if v is true, else sets a 0 in the flag status position
+ *
+ * Input:
+ *  cpu: needed cpu
+ *  flag: flag to set or unset
+ *  v: int that lets to choose setting or unsetting.
+ * */
 void set_flag(Cpu6502 *cpu, Flags6502 flag, int v);
 /*Interrupt Request*/
 void irq(Cpu6502 *cpu);
 /*Non Maskable Interrupt*/
 void nmi(Cpu6502 *cpu);
+
+/*
+ * Parses a given cpu in a string to print.
+ *
+ * Input: 
+ *  Cpu to parse
+ *
+ * output:
+ *  (Char*) parsed cpu.
+ *
+ */
 char* parse_cpu_str(Cpu6502 cpu);
 
 // Addressing Modes
