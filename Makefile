@@ -1,4 +1,5 @@
-flags=-Wall -lbsd -lc
+flags=-Wall -Wextra
+libs=-lbsd -lglfw -lGL -lGLU -lm -lX11 -lGLEW -lEGL -lOpenGL
 obj=gcc -c 
 out=gcc -o 
 name=famien
@@ -15,7 +16,7 @@ all: compile clean
 
 compile: $(objs)
 	@[ -d "$(build)" ] || { mkdir "$(build)"; }
-	$(out)$(target) $(objs) $(flags)
+	$(out)$(target) $(objs) $(flags) $(libs)
 
 example%:
 	$(target) $@.txt

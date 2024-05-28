@@ -1,32 +1,49 @@
-#include <stdio.h>
-#include "../include/cpu6502.h"
 #include "../include/bus.h"
+#include "../include/config.h"
+#include <stdio.h>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 
 int main(int argc, char** argv) {
     Bus bus;
-    printf("Bus instanced\n");
-
     initialize_bus(&bus);
+    GLFWwindow* window = NULL;
+    if(!glfwInit()){
+        fprintf(stderr, "ERROR: initializing glfw");
+        return -1;
+    }
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    for (u32 i = 0; i<10; i++) printf("Ram[%i]: %02X\n", i, bus.ram[i]);
-    bus.ram[0xFFFC] = 0x56;
-    bus.ram[0xFFFD] = 0xF1;
-    bus.ram[0xF156] = 0x61;
-    bus.ram[0xF158] = 0x65;
-    bus.ram[0xF15A] = 0x01;
-    bus.ram[0xF15C] = 0x06;
-    bus.ram[0xF15E] = 0x08;
-    bus.ram[0xF15F] = 0xBA;
-    bus.ram[0xF160] = 0xFE;
-    bus.ram[0xF163] = 0xB6;
-    bus.ram[0x0000] = 0x56;
-    bus.ram[0xF166] = 0xFE;
-    reset_cpu(&bus.cpu);
-    bus.cpu.a = 0x24;
-    bus.cpu.x = 0x14;
-    bus.cpu.y = 0xFF;
-    execute_cpu(&bus.cpu);
-    for (u32 i = 0xF154; i<0xF166; i++) printf("Ram[%i]: %02X\n", i, bus.ram[i]);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Famie", NULL, NULL);
+    if(!window){
+        fprintf(stderr, "ERROR: creating glfw window");
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+    glewExperimental = 1;
+    if(glewInit() != GLEW_OK){
+        fprintf(stderr, "ERROR: initializing glew");
+        return -1;
+    }
+
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+    do {
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    } while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS
+            && glfwWindowShouldClose(window) == 0);
+
+    printf("HOLA");
+
+    glfwTerminate();
 
     return 0;
 }
