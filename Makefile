@@ -11,6 +11,7 @@ target=$(build)$(name)
 objs=src/main.o \
 	 $(src)cpu6502.o \
 	 $(src)bus.o \
+	 $(src)window.o \
 
 all: compile clean
 
