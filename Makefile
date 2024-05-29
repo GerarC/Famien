@@ -1,4 +1,5 @@
-flags=-Wall -lbsd -lc
+flags=-Wall -Wextra
+libs=-lbsd -lglfw -lGL -lGLU -lm -lX11 -lGLEW -lEGL -lOpenGL
 obj=gcc -c 
 out=gcc -o 
 name=famien
@@ -10,6 +11,7 @@ target=$(build)$(name)
 objs=src/main.o \
 	 $(src)cpu6502.o \
 	 $(src)bus.o \
+	 $(src)window.o \
 	 $(src)map.o \
 	 $(src)utils.o \
 
@@ -17,7 +19,7 @@ all: compile clean
 
 compile: $(objs)
 	@[ -d "$(build)" ] || { mkdir "$(build)"; }
-	$(out)$(target) $(objs) $(flags)
+	$(out)$(target) $(objs) $(flags) $(libs)
 
 example%:
 	$(target) $@.txt
