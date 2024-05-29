@@ -10,6 +10,8 @@ target=$(build)$(name)
 objs=src/main.o \
 	 $(src)cpu6502.o \
 	 $(src)bus.o \
+	 $(src)map.o \
+	 $(src)utils.o \
 
 all: compile clean
 
