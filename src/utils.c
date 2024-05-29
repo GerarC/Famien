@@ -4,17 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* hex_string(u32 hex, Byte size){
-    assert(size>= 0 && size <= 8);
-    static char hex_str[9];
-    hex_str[size] = '\0';
-    for (int i = size - 1; i >= 0; i--){
-        hex_str[i] = "0123456789ABCDEF"[hex & 0xF];
-        hex>>=4;
-    }
-    return hex_str;
-}
-
 void disassembly(Cpu6502 cpu, map_str_t* instructions, Word start, Word end){
     u32 address = start;
     Byte value = 0x00;
@@ -24,11 +13,15 @@ void disassembly(Cpu6502 cpu, map_str_t* instructions, Word start, Word end){
 
     while(address <= (u32) end){
         line_addr = address;
+        static char laddr_str[9];
         static char parsed_instruction[32];
+
+
         char* parsed_phrase = (char*) malloc(sizeof(char)*32);
         Byte opcode = cpu.read_ram(cpu.bus, address);
         address++;
         Instruction instruction = cpu.lookup[opcode];
+        snprintf(laddr_str, sizeof(laddr_str), "%04X", line_addr);
 
         if(instruction.addrmode == &IMP)
             snprintf(
@@ -135,8 +128,17 @@ void disassembly(Cpu6502 cpu, map_str_t* instructions, Word start, Word end){
                     line_addr, instruction.name, value, address + value
             );
         }
+        
         memcpy(parsed_phrase, parsed_instruction, 32);
-        map_set(instructions, hex_string(line_addr, 4), parsed_phrase);
+        map_set(instructions, laddr_str, parsed_phrase);
+
+        /* const char* key; */
+        /* map_iter_t iter = map_iter(instructions); */
+        /* while((key = map_next(&iter))){ */
+        /*     printf("%s_%s\n", key, *map_get(instructions, key)); */
+        /* } */
+        /* printf("\n"); */
+
     }
 }
 

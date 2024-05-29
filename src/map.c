@@ -5,6 +5,7 @@
  * under the terms of the MIT license. See LICENSE for details.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../include/map.h"
@@ -13,8 +14,7 @@ struct map_node_t {
   unsigned hash;
   void *value;
   map_node_t *next;
-  /* char key[]; */
-  /* char value[]; */
+  map_node_t *oNext; // Doubly linked list pointers
 };
 
 
@@ -37,13 +37,12 @@ static map_node_t *map_newnode(const char *key, void *value, int vsize) {
   node->hash = map_hash(key);
   node->value = ((char*) (node + 1)) + voffset;
   memcpy(node->value, value, vsize);
+  node->oNext = NULL;
   return node;
 }
 
 
 static int map_bucketidx(map_base_t *m, unsigned hash) {
-  /* If the implementation is changed to allow a non-power-of-2 bucket count,
-   * the line below should be changed to use mod instead of AND */
   return hash & (m->nbuckets - 1);
 }
 
@@ -52,43 +51,51 @@ static void map_addnode(map_base_t *m, map_node_t *node) {
   int n = map_bucketidx(m, node->hash);
   node->next = m->buckets[n];
   m->buckets[n] = node;
+
+  if (m->tail) {
+    m->tail->oNext = node;
+    m->tail = node;
+  } else {
+    m->head = m->tail = node;
+  }
 }
 
 
+
 static int map_resize(map_base_t *m, int nbuckets) {
-  map_node_t *nodes, *node, *next;
+  map_node_t *node, *next, *head;
   map_node_t **buckets;
-  int i; 
-  /* Chain all nodes together */
-  nodes = NULL;
-  i = m->nbuckets;
-  while (i--) {
-    node = (m->buckets)[i];
-    while (node) {
-      next = node->next;
-      node->next = nodes;
-      nodes = node;
-      node = next;
-    }
-  }
-  /* Reset buckets */
+  head = m->head;
+
   buckets = realloc(m->buckets, sizeof(*m->buckets) * nbuckets);
   if (buckets != NULL) {
     m->buckets = buckets;
     m->nbuckets = nbuckets;
   }
+
   if (m->buckets) {
     memset(m->buckets, 0, sizeof(*m->buckets) * m->nbuckets);
-    /* Re-add nodes to buckets */
-    node = nodes;
-    while (node) {
-      next = node->next;
-      map_addnode(m, node);
-      node = next;
-    }
+    node = head;
+    do {
+      if(m->nnodes){
+        next = node->oNext;
+        map_addnode(m, node);
+        node = next;
+      }
+    } while (node != m->head && node != NULL);
   }
   /* Return error code if realloc() failed */
   return (buckets == NULL) ? -1 : 0;
+}
+
+map_node_t* previous_node(map_base_t* map, map_node_t* node) {
+    map_node_t* p = map->head;
+    map_node_t* prev = NULL;
+    while(p != NULL && p != node){
+        prev = p;
+        p = p->oNext;
+    }
+    return prev;
 }
 
 
@@ -157,37 +164,39 @@ int map_set_(map_base_t *m, const char *key, void *value, int vsize) {
 
 
 void map_remove_(map_base_t *m, const char *key) {
-  map_node_t *node;
+  map_node_t *node, *prev;
   map_node_t **next = map_getref(m, key);
   if (next) {
     node = *next;
     *next = (*next)->next;
+
+    
+    // Remove from the order list
+    if(m->head == node){
+      m->head = node->oNext;
+    }
+    prev = previous_node(m, node);
+    if(m->tail == node){
+      m->tail = prev;
+      prev->next = NULL;
+    }
+
     free(node);
     m->nnodes--;
   }
 }
 
 
-map_iter_t map_iter_(void) {
+map_iter_t map_iter_(map_base_t *m) {
   map_iter_t iter;
-  iter.bucketidx = -1;
-  iter.node = NULL;
+  iter.node = m->head;
   return iter;
 }
 
 
-const char *map_next_(map_base_t *m, map_iter_t *iter) {
-  if (iter->node) {
-    iter->node = iter->node->next;
-    if (iter->node == NULL) goto nextBucket;
-  } else {
-    nextBucket:
-    do {
-      if (++iter->bucketidx >= m->nbuckets) {
-        return NULL;
-      }
-      iter->node = m->buckets[iter->bucketidx];
-    } while (iter->node == NULL);
-  }
-  return (char*) (iter->node + 1);
+const char *map_next_(map_iter_t *iter) {
+  if (!iter->node) return NULL;
+  const char *key = (char*) (iter->node + 1);
+  iter->node = iter->node->oNext;
+  return key;
 }

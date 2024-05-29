@@ -18,10 +18,10 @@ typedef struct map_node_t map_node_t;
 typedef struct {
   map_node_t **buckets;
   unsigned nbuckets, nnodes;
+  map_node_t *head, *tail; // Pointers for doubly linked list
 } map_base_t;
 
 typedef struct {
-  unsigned bucketidx;
   map_node_t *node;
 } map_iter_t;
 
@@ -52,19 +52,19 @@ typedef struct {
 
 
 #define map_iter(m)\
-  map_iter_()
+  map_iter_(&(m)->base)
 
 
-#define map_next(m, iter)\
-  map_next_(&(m)->base, iter)
+#define map_next(iter)\
+  map_next_(iter)
 
 
 void map_deinit_(map_base_t *m);
 void *map_get_(map_base_t *m, const char *key);
 int map_set_(map_base_t *m, const char *key, void *value, int vsize);
 void map_remove_(map_base_t *m, const char *key);
-map_iter_t map_iter_(void);
-const char *map_next_(map_base_t *m, map_iter_t *iter);
+map_iter_t map_iter_(map_base_t *m);
+const char *map_next_(map_iter_t *iter);
 
 
 typedef map_t(void*) map_void_t;

@@ -9,13 +9,12 @@ int main(int argc, char** argv) {
     printf("Bus instanced\n");
     printf("\n");
     const char* key;
-    map_iter_t iter = map_iter(&map);
     map_str_t map;
     map_init(&map);
+    map_iter_t iter = map_iter(&map);
 
     initialize_bus(&bus);
 
-    for (u32 i = 0; i<10; i++) printf("Ram[%i]: %02X\n", i, bus.ram[i]);
     bus.ram[0xFFFC] = 0x56;
     bus.ram[0xFFFD] = 0xF1;
     bus.ram[0xF156] = 0x61;
@@ -55,7 +54,7 @@ int main(int argc, char** argv) {
     printf("\n");
     disassembly(bus.cpu, &map, 0xF156, 0xF166);
     iter = map_iter(&map);
-    while((key = map_next(&map, &iter))){
+    while((key = map_next(&iter))){
         printf("%s\n", *map_get(&map, key));
     }
     printf("\n");
@@ -64,18 +63,15 @@ int main(int argc, char** argv) {
     bus.cpu.a = 0x24;
     bus.cpu.x = 0x14;
     bus.cpu.y = 0xFF;
-    execute_cpu(&bus.cpu);
-
     printf("\n");
-    for (u32 i = 0xF154; i<0xF17F; i++) printf("Ram[%04X]: %02X\n", i, bus.ram[i]);
-    execute_cpu(&bus.cpu);
-    execute_cpu(&bus.cpu);
+    /* for (u32 i = 0xF154; i<0xF17F; i++) printf("Ram[%04X]: %02X\n", i, bus.ram[i]); */
 
     printf("\n");
     disassembly(bus.cpu, &map, 0xF156, 0xF170);
+    printf("\n");
     iter = map_iter(&map);
-    while((key = map_next(&map, &iter))){
-        printf("%s\n", *map_get(&map, key));
+    while((key = map_next(&iter))){
+        printf("%s_%s\n", key, *map_get(&map, key));
     }
 
     map_deinit(&map);
