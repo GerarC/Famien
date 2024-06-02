@@ -1,7 +1,8 @@
 #include "../include/window.h"
+#include <GLFW/glfw3.h>
 #include <stdio.h>
 
-void initialize_window(GLFWwindow** window, int width, int height, int* running){
+void initialize_window(GLFWwindow** window, int width, int height){
     if(!glfwInit()){
         fprintf(stderr, "ERROR: initializing glfw");
         return ;
@@ -25,16 +26,22 @@ void initialize_window(GLFWwindow** window, int width, int height, int* running)
         return ;
     }
     glfwSetInputMode(*window, GLFW_STICKY_KEYS, GL_TRUE);
-    *running = 1;
+    glfwSetKeyCallback(*window, input_callback);
+    glfwSwapInterval(1);
 }
 
-
-void update(GLFWwindow* window, int* running){
+void update(GLFWwindow* window){
         glfwSwapBuffers(window);
         glfwPollEvents();
 }
 
-void process_input(GLFWwindow* window, int* running){
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS
-            || glfwWindowShouldClose(window) != 0) *running = 0;
+void input_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+void main_loop(GLFWwindow* window){
+    while(!glfwWindowShouldClose(window)){
+        update(window);
+    }
 }

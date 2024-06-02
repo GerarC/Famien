@@ -7,7 +7,6 @@
 #include "../include/utils.h"
 
 int main(int argc, char** argv) {
-    int running;
     Bus bus;
     GLFWwindow* window = NULL;
     printf("Bus instanced\n");
@@ -18,7 +17,7 @@ int main(int argc, char** argv) {
     map_iter_t iter = map_iter(&map);
 
     initialize_bus(&bus);
-    initialize_window(&window, WIDTH, HEIGHT, &running);
+    initialize_window(&window, WIDTH, HEIGHT);
 
     printf("HOLA");
 
@@ -72,10 +71,7 @@ int main(int argc, char** argv) {
         printf("%s\n", *map_get(&map, key));
     }
 
-    while(running){
-        update(window, &running);
-        process_input(window, &running);
-    }
+    main_loop(window);
 
     map_deinit(&map);
     glfwTerminate();
