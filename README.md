@@ -12,8 +12,7 @@ Installation of libraries:
    
 - The used command in **Ubuntu** to install needed libraries is `sudo apt install libglfw3-dev libglew-dev libgl1-mesa-dev`.   
 
-
-### Windodo
+### Windows version
 *TODO:* I must to search a way to compile this in windows easily.
 
 

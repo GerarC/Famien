@@ -1,9 +1,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "types.h"
 #include "cpu6502.h"
 #include "map.h"
+#include "types.h"
 
 /*
  * Parses a hex number to a char*
@@ -16,7 +16,7 @@
  * output:
  *  a char* of the parsed hex.
  */
-char* hex_string(u32 hex, Byte size);
+char *hex_string(u32 hex, Byte size);
 
 /*
  * Disassembles a section of the ram.
@@ -28,8 +28,9 @@ char* hex_string(u32 hex, Byte size);
  *  end: memory address limit.
  *
  *  output:
- *      map with the ram portion parsed, where key is the memory address and the value is the disassembled instruction.
+ *      map with the ram portion parsed, where key is the memory address and the
+ * value is the disassembled instruction.
  */
-void disassembly(Cpu6502 cpu, map_str_t* instructions, Word start, Word end);
+void disassembly(Cpu6502 cpu, map_str_t *instructions, Word start, Word end);
 
-#endif//UTILS_H
+#endif // UTILS_H

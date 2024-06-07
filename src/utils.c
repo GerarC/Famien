@@ -1,5 +1,4 @@
 #include "../include/utils.h"
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -131,14 +130,6 @@ void disassembly(Cpu6502 cpu, map_str_t* instructions, Word start, Word end){
         
         memcpy(parsed_phrase, parsed_instruction, 32);
         map_set(instructions, laddr_str, parsed_phrase);
-
-        /* const char* key; */
-        /* map_iter_t iter = map_iter(instructions); */
-        /* while((key = map_next(&iter))){ */
-        /*     printf("%s_%s\n", key, *map_get(instructions, key)); */
-        /* } */
-        /* printf("\n"); */
-
     }
 }
 

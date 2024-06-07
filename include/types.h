@@ -9,4 +9,4 @@ typedef unsigned int u32;
 typedef struct bus_t Bus;
 typedef struct cpu6502_t Cpu6502;
 
-#endif//TYPES_H
+#endif // TYPES_H

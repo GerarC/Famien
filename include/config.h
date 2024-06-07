@@ -7,4 +7,4 @@
 #define FPS 30
 #define FRAME_TARGET_TIME (1000 / FPS)
 
-#endif//CONFIG_H
+#endif // CONFIG_H

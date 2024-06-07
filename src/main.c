@@ -1,10 +1,10 @@
 #include "../include/bus.h"
 #include "../include/config.h"
+#include "../include/map.h"
+#include "../include/utils.h"
 #include "../include/window.h"
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include "../include/map.h"
-#include "../include/utils.h"
 
 int main(int argc, char** argv) {
     Bus bus;
