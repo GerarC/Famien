@@ -1,4 +1,5 @@
 #include "../include/utils.h"
+#include "../include/log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -131,5 +132,6 @@ void disassembly(Cpu6502 cpu, map_str_t* instructions, Word start, Word end){
         memcpy(parsed_phrase, parsed_instruction, 32);
         map_set(instructions, laddr_str, parsed_phrase);
     }
+    log_info("Set of instructions dissasembled");
 }
 
